@@ -3,6 +3,6 @@ const router = express.Router();
 
 const controller = require('../controllers/song.controller');
 
-router.get("/", controller.index);
+router.post("/", controller.index);
 
 module.exports = router;
