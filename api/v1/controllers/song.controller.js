@@ -24,7 +24,7 @@ module.exports.index = async (req, res) => {
     //End Pagination
 
     if (objectPagination.currentPage <= objectPagination.totalPage) {
-        let songs = await Song.find(find).select("_id title idUser idTopic pathImage pathSong")
+        let songs = await Song.find(find).select("_id title idUser idTopic image audio")
             .lean();
 
         songs = songs.sort(() => randomSort);

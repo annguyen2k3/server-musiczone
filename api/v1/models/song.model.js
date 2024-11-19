@@ -6,8 +6,8 @@ const songSchema = new mongoose.Schema({
     idTopic: String,
     idUser: String,
     statusSecurity: String,
-    pathSong: String,
-    pathImage: String,
+    audio: String,
+    image: String,
     deleted: {
         type: Boolean,
         default: false
