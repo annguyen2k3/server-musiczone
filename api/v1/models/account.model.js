@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const accountSchema = new mongoose.Schema(
     {
         email: String,
+        type: String,
         password: String,
         token: String,
         deleted: {

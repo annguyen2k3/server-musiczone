@@ -17,6 +17,7 @@ module.exports.register = async (req, res) => {
 
     const existEmail = await Account.findOne({
         email: email,
+        type: "email",
         deleted: false,
     });
 
@@ -76,6 +77,7 @@ module.exports.otpEmail = async (req, res) => {
     } else {
         const account = new Account({
             email: result.email,
+            type: "email",
             password: result.password,
             token: generateHelpers.generateRandomString(30),
         });
@@ -83,6 +85,7 @@ module.exports.otpEmail = async (req, res) => {
         const user = new User({
             userName: result.userName,
             email: result.email,
+            token: account.token,
         });
 
         account.save();
@@ -106,6 +109,7 @@ module.exports.loginEmail = async (req, res) => {
 
     const account = await Account.findOne({
         email: email,
+        type: "email",
         deleted: false,
     });
 
@@ -141,6 +145,7 @@ module.exports.forgot = async (req, res) => {
 
     const existEmail = await Account.findOne({
         email: email,
+        type: "email",
         deleted: false,
     });
 
@@ -200,6 +205,7 @@ module.exports.otpPass = async (req, res) => {
 
     const account = await Account.findOne({
         email: email,
+        type: "email",
     });
 
     const token = account.token;
@@ -243,4 +249,58 @@ module.exports.resetPass = async (req, res) => {
         code: 200,
         message: "Đổi mật khẩu thành công!",
     });
+};
+
+// [GET] /account/auth/google
+module.exports.authGoogle = async (req, res) => {
+    try {
+        const email = req.user._json.email;
+        const userName = req.user._json.name;
+
+        const account = await Account.findOne({
+            email: email,
+            type: "google",
+            deleted: false,
+        });
+
+        if (account) {
+            const token = account.token;
+            res.cookie("token", token);
+
+            res.json({
+                code: 200,
+                message: "Đăng nhập thành công!",
+                token: token,
+            });
+        } else {
+            const newAcc = new Account({
+                email: email,
+                type: "google",
+                token: generateHelpers.generateRandomString(30),
+            });
+
+            const user = new User({
+                userName: userName,
+                email: email,
+                token: newAcc.token,
+            });
+
+            newAcc.save();
+            user.save();
+
+            const token = newAcc.token;
+            res.cookie("token", token);
+
+            res.json({
+                code: 200,
+                message: "Đăng nhập thành công!",
+                token: token,
+            });
+        }
+    } catch (error) {
+        res.json({
+            code: 400,
+            message: "Đăng nhập thất bại!",
+        });
+    }
 };

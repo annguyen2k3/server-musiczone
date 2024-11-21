@@ -41,13 +41,8 @@ module.exports = (app) => {
         "/auth/google/callback",
         passport.authenticate("google", { failureRedirect: "/" }),
         (req, res) => {
-            res.redirect("/profile");
+            res.redirect(version + "/account/auth/google");
         }
     );
-
-    app.get("/profile", (req, res) => {
-        res.send(`Welcome ${req.user._json.name} - ${req.user._json.email}`);
-        console.log(req.user._json);
-    });
     //End Login with Google
 };

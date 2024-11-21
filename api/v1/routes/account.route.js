@@ -25,4 +25,6 @@ router.post(
     controller.resetPass
 );
 
+router.get("/auth/google", controller.authGoogle);
+
 module.exports = router;
