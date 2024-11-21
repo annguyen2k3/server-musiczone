@@ -4,6 +4,8 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
+const passport = require("passport");
+const GoogleStrategy = require("passport-google-oauth20").Strategy;
 
 const database = require("./config/database");
 const routesApiVer1 = require("./api/v1/routes/index.route");
@@ -28,6 +30,10 @@ app.use(
         saveUninitialized: true,
     })
 );
+
+//Passport
+app.use(passport.initialize());
+app.use(passport.session());
 
 //Cookie Parser
 app.use(cookieParser());

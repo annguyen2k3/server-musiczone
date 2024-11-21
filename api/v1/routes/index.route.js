@@ -1,5 +1,24 @@
 const songRoutes = require("./song.route");
 const accountRoutes = require("./account.route");
+const passport = require("passport");
+const GoogleStrategy = require("passport-google-oauth20").Strategy;
+
+//Passport
+passport.use(
+    new GoogleStrategy(
+        {
+            clientID: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+            callbackURL: "http://localhost:3000/auth/google/callback",
+        },
+        (accessToken, refreshToken, profile, done) => {
+            return done(null, profile);
+        }
+    )
+);
+passport.serializeUser((user, done) => done(null, user));
+passport.deserializeUser((user, done) => done(null, user));
+//End Passport
 
 module.exports = (app) => {
     const version = "/api/v1";
@@ -11,4 +30,24 @@ module.exports = (app) => {
     app.use(version + "/songs", songRoutes);
 
     app.use(version + "/account", accountRoutes);
+
+    //Login with Google
+    app.get(
+        "/auth/google",
+        passport.authenticate("google", { scope: ["profile", "email"] })
+    );
+
+    app.get(
+        "/auth/google/callback",
+        passport.authenticate("google", { failureRedirect: "/" }),
+        (req, res) => {
+            res.redirect("/profile");
+        }
+    );
+
+    app.get("/profile", (req, res) => {
+        res.send(`Welcome ${req.user._json.name} - ${req.user._json.email}`);
+        console.log(req.user._json);
+    });
+    //End Login with Google
 };
