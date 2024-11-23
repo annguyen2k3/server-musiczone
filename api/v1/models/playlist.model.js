@@ -1,24 +1,22 @@
 const mongoose = require("mongoose");
 
-const songSchema = new mongoose.Schema(
+const playlistSchema = new mongoose.Schema(
     {
+        idUser: String,
         title: String,
+        avatar: String,
+        statusSecurity: String,
+        listSongs: {
+            type: Array,
+            default: [],
+        },
         description: {
             type: String,
             default: "",
         },
-        idTopic: String,
-        idUser: String,
-        statusSecurity: String,
-        audio: String,
-        image: String,
-        like: {
+        likes: {
             type: Array,
             default: [],
-        },
-        listen: {
-            type: Number,
-            default: 0,
         },
         deleted: {
             type: Boolean,
@@ -31,6 +29,6 @@ const songSchema = new mongoose.Schema(
     }
 );
 
-const Song = mongoose.model("Song", songSchema, "songs");
+const PlayList = mongoose.model("PlayList", playlistSchema, "playlists");
 
-module.exports = Song;
+module.exports = PlayList;

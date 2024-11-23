@@ -1,7 +1,10 @@
+const GoogleStrategy = require("passport-google-oauth20").Strategy;
+const passport = require("passport");
+
 const songRoutes = require("./song.route");
 const accountRoutes = require("./account.route");
-const passport = require("passport");
-const GoogleStrategy = require("passport-google-oauth20").Strategy;
+const playlistRoutes = require("./playlist.route");
+const userRoutes = require("./user.route");
 
 //Passport
 passport.use(
@@ -30,6 +33,10 @@ module.exports = (app) => {
     app.use(version + "/songs", songRoutes);
 
     app.use(version + "/account", accountRoutes);
+
+    app.use(version + "/playlist", playlistRoutes);
+
+    app.use(version + "/user", userRoutes);
 
     //Login with Google
     app.get(

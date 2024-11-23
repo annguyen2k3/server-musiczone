@@ -256,6 +256,7 @@ module.exports.authGoogle = async (req, res) => {
     try {
         const email = req.user._json.email;
         const userName = req.user._json.name;
+        const avatar = req.user._json.picture;
 
         const account = await Account.findOne({
             email: email,
@@ -282,6 +283,7 @@ module.exports.authGoogle = async (req, res) => {
             const user = new User({
                 userName: userName,
                 email: email,
+                avatar: avatar,
                 token: newAcc.token,
             });
 
