@@ -12,7 +12,7 @@ passport.use(
         {
             clientID: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-            callbackURL: process.env.CALLBACK_URL_GG,
+            callbackURL: "https://server-musiczone.vercel.app/auth/google/callback",
         },
         (accessToken, refreshToken, profile, done) => {
             return done(null, profile);
