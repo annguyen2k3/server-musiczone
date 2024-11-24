@@ -26,29 +26,37 @@ const nodemailer = require("nodemailer");
 //     });
 // };
 
-module.exports.sendMail = async (email, subject, html) => {
-    const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-        },
-    });
-
-    // async..await is not allowed in global scope, must use a wrapper
-    async function main() {
-        // send mail with defined transport object
-        const info = await transporter.sendMail({
-            from: process.env.EMAIL_USER, // sender address
-            to: email, // list of receivers
-            subject: subject, // Subject line
-            text: "Hello world?", // plain text body
-            html: html, // html body
+async function wrapedSendMail(mailOptions) {
+    return new Promise((resolve, reject) => {
+        let transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
+            },
         });
 
-        console.log("Message sent: %s", info.messageId);
-        // Message sent: <d786aa62-4e0a-070a-47ed-0b0666549519@ethereal.email>
-    }
+        transporter.sendMail(mailOptions, function (error, info) {
+            if (error) {
+                console.log("error is " + error);
+                resolve(false);
+            } else {
+                console.log("Email sent : " + info.response);
+                resolve(true);
+            }
+        });
+    });
+}
 
-    main().catch(console.error);
+module.exports.sendMail = async (email, subject, html) => {
+    var mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: subject,
+        html: html,
+    };
+
+    let resp = await wrapedSendMail(mailOptions);
+
+    return resp;
 };
