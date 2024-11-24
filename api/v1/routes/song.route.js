@@ -1,8 +1,10 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
-const controller = require('../controllers/song.controller');
+const controller = require("../controllers/song.controller");
 
 router.post("/", controller.index);
+
+router.get("/detail/:id", controller.detail);
 
 module.exports = router;

@@ -52,3 +52,58 @@ module.exports.index = async (req, res) => {
         songs: songs,
     });
 };
+
+module.exports.detail = async (req, res) => {
+    const id = req.params.id;
+
+    const song = await Song.findOne({
+        _id: id,
+        deleted: false,
+    }).lean();
+
+    const user = await User.findOne({
+        _id: song.idUser,
+        deleted: false,
+    }).lean();
+
+    const songs = await Song.find({
+        deleted: false,
+        statusSecurity: "public",
+        idUser: user._id,
+    }).lean();
+
+    const topic = await Topic.findOne({
+        _id: song.idTopic,
+        deleted: false,
+    }).lean();
+
+    if (req.headers.authorization) {
+        const token = req.headers.authorization.split(" ")[1];
+
+        const userLike = await User.findOne({
+            deleted: false,
+            token: token,
+        }).lean();
+
+        for (const i of song.like) {
+            if (i == userLike._id) {
+                song["liked"] = true;
+                break;
+            }
+        }
+    }
+
+    song["titleTopic"] = topic.title;
+
+    res.json({
+        code: 200,
+        message: "Thành công!",
+        song: song,
+        user: {
+            _id: user._id,
+            userName: user.userName,
+            numTrack: songs.length,
+            numFollower: user.follower.length,
+        },
+    });
+};
