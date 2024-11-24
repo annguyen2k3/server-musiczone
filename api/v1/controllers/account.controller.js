@@ -50,7 +50,7 @@ module.exports.register = async (req, res) => {
             Vui lòng không chia sẻ mã OTP này với bất kỳ ai.
         `;
 
-        sendMailHelper.sendMail(email, subject, html);
+        await sendMailHelper.sendMail(email, subject, html);
 
         res.json({
             code: 200,
