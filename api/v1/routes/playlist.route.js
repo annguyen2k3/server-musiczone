@@ -5,4 +5,6 @@ const controller = require("../controllers/playlist.controller");
 
 router.get("/toptrending", controller.toptrending);
 
+router.get("/detail/:id", controller.detail);
+
 module.exports = router;
