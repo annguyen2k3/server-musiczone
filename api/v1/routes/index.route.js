@@ -1,6 +1,10 @@
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const passport = require("passport");
 
+const Account = require("../models/account.model");
+const User = require("../models/user.model");
+const generateHelpers = require("../../../helpers/generate");
+
 const songRoutes = require("./song.route");
 const accountRoutes = require("./account.route");
 const playlistRoutes = require("./playlist.route");
@@ -12,10 +16,48 @@ passport.use(
         {
             clientID: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-            callbackURL: "https://server-musiczone.vercel.app/auth/google/callback",
+            callbackURL: process.env.CALLBACK_URL_GG,
         },
-        (accessToken, refreshToken, profile, done) => {
-            return done(null, profile);
+        async (accessToken, refreshToken, profile, done) => {
+            try {
+                const email = profile.emails[0].value;
+                const userName = profile.displayName;
+                const avatar = profile.photos[0].value;
+
+                const account = await Account.findOne({
+                    email: email,
+                    type: "google",
+                    deleted: false,
+                });
+
+                let token;
+                let user;
+                if (account) {
+                    token = account.token;
+                } else {
+                    // Tạo tài khoản mới nếu chưa tồn tại
+                    const newAcc = new Account({
+                        email: email,
+                        type: "google",
+                        token: generateHelpers.generateRandomString(30),
+                    });
+
+                    user = new User({
+                        userName: userName,
+                        email: email,
+                        avatar: avatar,
+                        token: newAcc.token,
+                    });
+
+                    await newAcc.save();
+                    await user.save();
+                    token = newAcc.token;
+                }
+
+                return done(null, { token });
+            } catch (error) {
+                return done(error, null);
+            }
         }
     )
 );
@@ -39,6 +81,7 @@ module.exports = (app) => {
     app.use(version + "/user", userRoutes);
 
     //Login with Google
+
     app.get(
         "/auth/google",
         passport.authenticate("google", { scope: ["profile", "email"] })
@@ -47,8 +90,10 @@ module.exports = (app) => {
     app.get(
         "/auth/google/callback",
         passport.authenticate("google", { failureRedirect: "/" }),
-        (req, res) => {
-            res.redirect(version + "/account/auth/google");
+        async (req, res) => {
+            const token = req.user.token;
+
+            res.redirect(`${process.env.REDIRECT_URL_GG}?token=${token}`);
         }
     );
     //End Login with Google

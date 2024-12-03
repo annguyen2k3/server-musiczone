@@ -17,7 +17,11 @@ const port = process.env.PORT;
 database.connect();
 
 //Cors
-app.use(cors());
+app.use(
+    cors({
+        origin: "*",
+    })
+);
 
 // parse application/json
 app.use(bodyParser.json());
