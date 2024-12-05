@@ -93,6 +93,7 @@ module.exports = (app) => {
         async (req, res) => {
             const token = req.user.token;
 
+            console.log("url: " + process.env.REDIRECT_URL_GG);
             res.redirect(`${process.env.REDIRECT_URL_GG}?token=${token}`);
         }
     );

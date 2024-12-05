@@ -53,6 +53,7 @@ module.exports.index = async (req, res) => {
     });
 };
 
+//[GET] /api/v1/songs
 module.exports.detail = async (req, res) => {
     const id = req.params.id;
 
@@ -106,4 +107,29 @@ module.exports.detail = async (req, res) => {
             numFollower: user.follower.length,
         },
     });
+};
+
+//[POST] /api/v1/songs/upload
+module.exports.upload = async (req, res) => {
+    try {
+        const dataSong = req.body;
+
+        dataSong.audio = dataSong.audio[0];
+        dataSong.image = dataSong.image[0];
+
+        const song = new Song(dataSong);
+        await song.save();
+
+        res.json({
+            code: 200,
+            message: "Thêm thành công!",
+            song: song,
+        });
+    } catch (error) {
+        console.log(error);
+        res.json({
+            code: 400,
+            message: "Thêm thất bại!",
+        });
+    }
 };
