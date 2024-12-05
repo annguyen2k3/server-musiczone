@@ -5,4 +5,8 @@ const controller = require("../controllers/user.controller");
 
 router.post("/", controller.index);
 
+router.get("/:id", controller.detailUser);
+
+router.get("/token/:token", controller.detailUserToken);
+
 module.exports = router;
