@@ -9,6 +9,7 @@ const songRoutes = require("./song.route");
 const accountRoutes = require("./account.route");
 const playlistRoutes = require("./playlist.route");
 const userRoutes = require("./user.route");
+const topicRoutes = require("./topic.route");
 
 //Passport
 passport.use(
@@ -79,6 +80,8 @@ module.exports = (app) => {
     app.use(version + "/playlist", playlistRoutes);
 
     app.use(version + "/user", userRoutes);
+
+    app.use(version + "/topics", topicRoutes);
 
     //Login with Google
 
