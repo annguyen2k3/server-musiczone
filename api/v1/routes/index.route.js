@@ -93,7 +93,7 @@ module.exports = (app) => {
         async (req, res) => {
             const token = req.user.token;
 
-            res.redirect(`${process.env.REDIRECT_URL_GG}?token=${token}`);
+            res.redirect(`http://127.0.0.1:5500/?token=${token}`);
         }
     );
     //End Login with Google
