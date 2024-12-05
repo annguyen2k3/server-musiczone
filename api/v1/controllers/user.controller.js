@@ -52,67 +52,81 @@ module.exports.index = async (req, res) => {
 
 //[GET] /api/v1/user/:id
 module.exports.detailUser = async (req, res) => {
-    const id = req.params.id;
-    let followed = false;
+    try {
+        const id = req.params.id;
+        let followed = false;
 
-    const user = await User.findOne({
-        _id: id,
-        deleted: false,
-    }).lean();
-
-    if (req.headers.authorization) {
-        const token = req.headers.authorization.split(" ")[1];
-
-        const userMe = await User.findOne({
-            token: token,
+        const user = await User.findOne({
+            _id: id,
             deleted: false,
-        });
+        }).lean();
 
-        if (user.follower.includes(userMe.id)) {
-            followed = true;
+        if (req.headers.authorization) {
+            const token = req.headers.authorization.split(" ")[1];
+
+            const userMe = await User.findOne({
+                token: token,
+                deleted: false,
+            });
+
+            if (user.follower.includes(userMe.id)) {
+                followed = true;
+            }
         }
-    }
 
-    res.json({
-        code: 200,
-        message: "Thành công!",
-        user: {
-            id: user._id,
-            userName: user.userName,
-            company: user.company,
-            address: user.address,
-            email: user.email,
-            introduce: user.introduce,
-            avatar: user.avatar,
-            followed: followed,
-            follower: user.follower.length,
-            following: user.following.length,
-        },
-    });
+        res.json({
+            code: 200,
+            message: "Thành công!",
+            user: {
+                id: user._id,
+                userName: user.userName,
+                company: user.company,
+                address: user.address,
+                email: user.email,
+                introduce: user.introduce,
+                avatar: user.avatar,
+                followed: followed,
+                follower: user.follower.length,
+                following: user.following.length,
+            },
+        });
+    } catch (error) {
+        res.json({
+            code: 400,
+            message: "Thất bại!",
+        });
+    }
 };
 
 //[GET] /api/v1/user/token/:token
 module.exports.detailUserToken = async (req, res) => {
-    const token = req.params.token;
+    try {
+        const token = req.params.token;
 
-    const user = await User.findOne({
-        token: token,
-        deleted: false,
-    }).lean();
+        const user = await User.findOne({
+            token: token,
+            deleted: false,
+        }).lean();
 
-    res.json({
-        code: 200,
-        message: "Thành công!",
-        user: {
-            id: user._id,
-            userName: user.userName,
-            company: user.company,
-            address: user.address,
-            email: user.email,
-            introduce: user.introduce,
-            avatar: user.avatar,
-            follower: user.follower.length,
-            following: user.following.length,
-        },
-    });
+        res.json({
+            code: 200,
+            message: "Thành công!",
+            user: {
+                id: user._id,
+                userName: user.userName,
+                company: user.company,
+                address: user.address,
+                email: user.email,
+                introduce: user.introduce,
+                avatar: user.avatar,
+                follower: user.follower.length,
+                following: user.following.length,
+            },
+        });
+    } catch (error) {
+        res.json({
+            code: 400,
+            message: "Thất bại",
+        });
+    }
 };

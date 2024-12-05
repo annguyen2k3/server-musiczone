@@ -133,3 +133,21 @@ module.exports.upload = async (req, res) => {
         });
     }
 };
+
+module.exports.edit = async (req, res) => {
+    const id = req.params.id;
+
+    try {
+        await Song.updateOne({ _id: id }, req.body);
+
+        res.json({
+            code: 200,
+            message: "Thành công!",
+        });
+    } catch (error) {
+        res.json({
+            code: 400,
+            message: "Thất bại",
+        });
+    }
+};

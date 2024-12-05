@@ -23,4 +23,11 @@ router.post(
     controller.upload
 );
 
+router.patch(
+    "/edit/:id",
+    upload.single("image"),
+    uploadCloud.uploadSingle,
+    controller.edit
+);
+
 module.exports = router;
