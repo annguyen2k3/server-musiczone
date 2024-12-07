@@ -21,6 +21,14 @@ module.exports.register = async (req, res) => {
         deleted: false,
     });
 
+    if (!userName) {
+        res.json({
+            code: 400,
+            err: "userName",
+            message: "Vui lòng nhập userName",
+        });
+    }
+
     if (existEmail) {
         res.json({
             code: 400,
@@ -303,6 +311,27 @@ module.exports.authGoogle = async (req, res) => {
         res.json({
             code: 400,
             message: "Đăng nhập thất bại!",
+        });
+    }
+};
+
+// [DELETE] /account/delete
+module.exports.delete = async (req, res) => {
+    const token = req.body.token;
+
+    if (token) {
+        await User.deleteOne({ token: token });
+
+        await Account.deleteOne({ token: token });
+
+        res.json({
+            code: 200,
+            message: "Xoá thành công!",
+        });
+    } else {
+        res.json({
+            code: 400,
+            message: "Token không tồn tại!",
         });
     }
 };

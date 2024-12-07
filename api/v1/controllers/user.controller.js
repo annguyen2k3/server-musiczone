@@ -2,12 +2,12 @@ const User = require("../models/user.model");
 const Song = require("../models/song.model");
 
 //[POST] /api/v1/user
-module.exports.index = async (req, res) => {
-    let countRecords = 9;
+module.exports.getUsers = async (req, res) => {
+    let countRecords = 5;
     const resultUsers = [];
 
-    if (req.body.countRecords) {
-        countRecords = req.body.countRecords;
+    if (req.query.countRecord) {
+        countRecord = parseInt(req.query.countRecord);
     }
 
     let find = {
@@ -16,7 +16,7 @@ module.exports.index = async (req, res) => {
 
     const users = await User.aggregate([
         { $match: find },
-        { $sample: { size: countRecords } },
+        { $sample: { size: countRecord } },
         {
             $project: {
                 _id: 1,

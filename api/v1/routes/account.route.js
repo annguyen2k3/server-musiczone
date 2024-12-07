@@ -27,4 +27,6 @@ router.post(
 
 router.get("/auth/google", controller.authGoogle);
 
+router.delete("/delete", controller.delete);
+
 module.exports = router;

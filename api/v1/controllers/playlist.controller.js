@@ -98,3 +98,55 @@ module.exports.detail = async (req, res) => {
         songs: songs,
     });
 };
+
+//[GET] /api/v1/playlist/getPlaylists
+module.exports.getPlaylists = async (req, res) => {
+    try {
+        let countRecord = 1;
+        if (req.query.countRecord) {
+            countRecord = parseInt(req.query.countRecord);
+        }
+
+        let find = {
+            statusSecurity: "public",
+            deleted: false,
+        };
+
+        const playlists = await PlayList.aggregate([
+            {
+                $match: find,
+            },
+            {
+                $sample: {
+                    size: countRecord,
+                },
+            },
+            {
+                $project: {
+                    _id: 1,
+                    idUser: 1,
+                    title: 1,
+                    avatar: 1,
+                    description: 1,
+                    statusSecurity: 1,
+                    createdAt: 1,
+                    likes: 1,
+                    listSongs: 1,
+                },
+            },
+        ]);
+
+        console.log(playlists);
+
+        res.json({
+            code: 200,
+            message: "Thành công!",
+            playlists: playlists,
+        });
+    } catch (error) {
+        res.json({
+            code: 400,
+            message: "Thất bại!",
+        });
+    }
+};
