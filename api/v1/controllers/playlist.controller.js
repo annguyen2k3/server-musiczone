@@ -167,8 +167,11 @@ module.exports.like = async (req, res) => {
 
             switch (type) {
                 case "like":
-                    playlist.likes.push(user.id);
-                    await playlist.save();
+                    const indexLike = playlist.likes.indexOf(user.id);
+                    if (indexLike === -1) {
+                        playlist.likes.push(user.id);
+                        await playlist.save();
+                    }
                     break;
 
                 case "unlike":
