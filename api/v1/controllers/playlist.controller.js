@@ -150,3 +150,53 @@ module.exports.getPlaylists = async (req, res) => {
         });
     }
 };
+
+// [PATCH] /api/v1/playlist/like
+module.exports.like = async (req, res) => {
+    try {
+        const type = req.body.type;
+        const idPlaylist = req.body.idPlaylist;
+        const user = req.user;
+
+        if (type && idPlaylist) {
+            const playlist = await PlayList.findOne({
+                _id: idPlaylist,
+                deleted: false,
+                statusSecurity: "public",
+            });
+
+            switch (type) {
+                case "like":
+                    playlist.likes.push(user.id);
+                    await playlist.save();
+                    break;
+
+                case "unlike":
+                    const index = playlist.likes.indexOf(user.id);
+                    if (index !== -1) {
+                        playlist.likes.splice(index, 1);
+                    }
+                    await playlist.save();
+                    break;
+
+                default:
+                    break;
+            }
+
+            res.json({
+                code: 200,
+                message: "Thành công!",
+            });
+        } else {
+            res.json({
+                code: 400,
+                message: "Thiếu dữ liệu gửi lên!",
+            });
+        }
+    } catch (error) {
+        res.json({
+            code: 200,
+            message: "Thất bại: " + error.message,
+        });
+    }
+};

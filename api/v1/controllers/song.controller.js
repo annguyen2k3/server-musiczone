@@ -134,6 +134,7 @@ module.exports.upload = async (req, res) => {
     }
 };
 
+// [PATCH] /api/v1/songs/edit/:id
 module.exports.edit = async (req, res) => {
     const id = req.params.id;
 
@@ -148,6 +149,49 @@ module.exports.edit = async (req, res) => {
         res.json({
             code: 400,
             message: "Thất bại",
+        });
+    }
+};
+
+// [PATCH] /api/v1/songs/like
+module.exports.like = async (req, res) => {
+    const type = req.body.type;
+    const idSong = req.body.idSong;
+    const user = req.user;
+
+    if (type && idSong) {
+        const song = await Song.findOne({
+            _id: idSong,
+            deleted: false,
+            statusSecurity: "public",
+        });
+
+        switch (type) {
+            case "like":
+                song.like.push(user.id);
+                await song.save();
+                break;
+
+            case "unlike":
+                const index = song.like.indexOf(user.id);
+                if (index !== -1) {
+                    song.like.splice(index, 1);
+                }
+                await song.save();
+                break;
+
+            default:
+                break;
+        }
+
+        res.json({
+            code: 200,
+            message: "Thành công!",
+        });
+    } else {
+        res.json({
+            code: 400,
+            message: "Thiếu dữ liệu gửi lên!",
         });
     }
 };

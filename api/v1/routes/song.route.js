@@ -4,6 +4,7 @@ const multer = require("multer");
 
 const controller = require("../controllers/song.controller");
 const uploadCloud = require("../../../middleware/uploadCloud.middleware");
+const authMiddeware = require("../../../middleware/auth.middleware");
 
 const upload = multer({
     storage: multer.memoryStorage(),
@@ -29,5 +30,7 @@ router.patch(
     uploadCloud.uploadSingle,
     controller.edit
 );
+
+router.patch("/like", authMiddeware.requireAuth, controller.like);
 
 module.exports = router;

@@ -130,3 +130,73 @@ module.exports.detailUserToken = async (req, res) => {
         });
     }
 };
+
+module.exports.follow = async (req, res) => {
+    try {
+        const type = req.body.type;
+        const idUserFollow = req.body.idUser;
+        const user = req.user;
+
+        if (type && idUserFollow) {
+            const userFollow = await User.findOne({
+                _id: idUserFollow,
+                deleted: false,
+            });
+
+            switch (type) {
+                case "follow":
+                    const indexFollower = userFollow.follower.indexOf(user.id);
+                    if (indexFollower === -1) {
+                        userFollow.follower.push(user.id);
+                        await userFollow.save();
+                    }
+
+                    const indexFollowing = user.following.indexOf(
+                        userFollow.id
+                    );
+                    if (indexFollowing === -1) {
+                        user.following.push(userFollow.id);
+                        await user.save();
+                    }
+                    break;
+
+                case "unfollow":
+                    const indexUnFollower = userFollow.follower.indexOf(
+                        user.id
+                    );
+                    if (indexUnFollower !== -1) {
+                        userFollow.follower.splice(indexUnFollower, 1);
+                        await userFollow.save();
+                    }
+
+                    const indexUnFollowing = user.following.indexOf(
+                        userFollow.id
+                    );
+                    if (indexUnFollowing !== -1) {
+                        user.following.splice(indexUnFollowing, 1);
+                        await user.save();
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+
+            res.json({
+                code: 200,
+                message: "Thành công!",
+                userFollow: userFollow,
+            });
+        } else {
+            res.json({
+                code: 400,
+                message: "Thiếu dữ liệu gửi lên!",
+            });
+        }
+    } catch (error) {
+        res.json({
+            code: 400,
+            message: "Thất bại: " + error.message,
+        });
+    }
+};
