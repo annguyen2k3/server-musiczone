@@ -26,6 +26,7 @@ module.exports.index = async (req, res) => {
                 idTopic: 1,
                 image: 1,
                 audio: 1,
+                like: 1,
             },
         },
     ]);

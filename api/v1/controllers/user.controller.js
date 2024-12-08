@@ -1,5 +1,6 @@
 const User = require("../models/user.model");
 const Song = require("../models/song.model");
+const { like } = require("./song.controller");
 
 //[POST] /api/v1/user
 module.exports.getUsers = async (req, res) => {
@@ -7,7 +8,7 @@ module.exports.getUsers = async (req, res) => {
     const resultUsers = [];
 
     if (req.query.countRecord) {
-        countRecord = parseInt(req.query.countRecord);
+        countRecords = parseInt(req.query.countRecord);
     }
 
     let find = {
