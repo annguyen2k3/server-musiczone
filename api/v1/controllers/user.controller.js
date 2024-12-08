@@ -4,11 +4,11 @@ const { like } = require("./song.controller");
 
 //[POST] /api/v1/user
 module.exports.getUsers = async (req, res) => {
-    let countRecords = 5;
+    let countRecord = 5;
     const resultUsers = [];
 
     if (req.query.countRecord) {
-        countRecords = parseInt(req.query.countRecord);
+        countRecord = parseInt(req.query.countRecord);
     }
 
     let find = {
