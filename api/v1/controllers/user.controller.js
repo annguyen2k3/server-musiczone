@@ -62,6 +62,11 @@ module.exports.detailUser = async (req, res) => {
             deleted: false,
         }).lean();
 
+        const songs = await Song.find({
+            idUser: user._id,
+            deleted: false,
+        }).lean();
+
         if (req.headers.authorization) {
             const token = req.headers.authorization.split(" ")[1];
 
@@ -89,6 +94,7 @@ module.exports.detailUser = async (req, res) => {
                 followed: followed,
                 follower: user.follower.length,
                 following: user.following.length,
+                numTrack: songs.length,
             },
         });
     } catch (error) {
@@ -132,6 +138,7 @@ module.exports.detailUserToken = async (req, res) => {
     }
 };
 
+// [PATCH] /api/v1/user/follow
 module.exports.follow = async (req, res) => {
     try {
         const type = req.body.type;
@@ -198,6 +205,58 @@ module.exports.follow = async (req, res) => {
         res.json({
             code: 400,
             message: "Thất bại: " + error.message,
+        });
+    }
+};
+
+// [PATCH] /api/v1/user/edit
+module.exports.edit = async (req, res) => {
+    try {
+        const user = req.user;
+
+        await User.updateOne({ _id: user.id }, req.body);
+
+        const userUpdate = await User.findOne({
+            _id: user.id,
+        });
+
+        res.json({
+            code: 200,
+            message: "Thành công!",
+            userUpdate: userUpdate,
+        });
+    } catch (error) {
+        res.json({
+            code: 400,
+            message: "Thất bại!",
+        });
+    }
+};
+
+// [GET] /api/v1/users/favoriteSong
+module.exports.favoriteSong = async (req, res) => {
+    try {
+        const user = req.user;
+        const listSongResult = [];
+
+        for (const idSong of user.songFavorite) {
+            const song = await Song.findOne({
+                _id: idSong,
+                deleted: false,
+            }).lean();
+
+            listSongResult.push(song);
+        }
+
+        res.json({
+            code: 200,
+            message: "Thành công!",
+            listSong: listSongResult.reverse(),
+        });
+    } catch (error) {
+        res.json({
+            code: 400,
+            message: "Thất bại!",
         });
     }
 };

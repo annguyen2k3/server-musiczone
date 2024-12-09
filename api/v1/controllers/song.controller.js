@@ -54,7 +54,7 @@ module.exports.index = async (req, res) => {
     });
 };
 
-//[GET] /api/v1/songs
+//[GET] /api/v1/songs/detail
 module.exports.detail = async (req, res) => {
     const id = req.params.id;
 
@@ -173,6 +173,9 @@ module.exports.like = async (req, res) => {
                 if (indexLike === -1) {
                     song.like.push(user.id);
                     await song.save();
+
+                    user.songFavorite.push(song.id);
+                    await user.save();
                 }
                 break;
 
@@ -180,8 +183,14 @@ module.exports.like = async (req, res) => {
                 const indexUnLike = song.like.indexOf(user.id);
                 if (indexUnLike !== -1) {
                     song.like.splice(indexUnLike, 1);
+                    await song.save();
                 }
-                await song.save();
+
+                const indexSongFavor = user.songFavorite.indexOf(song.id);
+                if (indexSongFavor !== -1) {
+                    user.songFavorite.splice(indexSongFavor, 1);
+                    await user.save();
+                }
                 break;
 
             default:
