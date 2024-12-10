@@ -33,6 +33,10 @@ const userSchema = new mongoose.Schema(
             type: Array,
             default: [],
         },
+        playlistFavorite: {
+            type: Array,
+            default: [],
+        },
         token: String,
         deleted: {
             type: Boolean,

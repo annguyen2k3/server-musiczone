@@ -33,4 +33,6 @@ router.patch(
 
 router.patch("/like", authMiddeware.requireAuth, controller.like);
 
+router.delete("/delete/:id", authMiddeware.requireAuth, controller.delete);
+
 module.exports = router;

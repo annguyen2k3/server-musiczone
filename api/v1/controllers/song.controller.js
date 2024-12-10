@@ -208,3 +208,33 @@ module.exports.like = async (req, res) => {
         });
     }
 };
+
+// [DELETE] /api/v1/songs/delete/:id
+module.exports.delete = async (req, res) => {
+    try {
+        const user = req.user;
+        const id = req.params.id;
+
+        const songDelete = await Song.findOne({
+            _id: id,
+        });
+
+        if (songDelete.idUser == user.id) {
+            await Song.deleteOne({ _id: id });
+            res.json({
+                code: 200,
+                message: "Thành công!",
+            });
+        } else {
+            res.json({
+                code: 400,
+                message: "Không có quyền xoá!",
+            });
+        }
+    } catch (error) {
+        res.json({
+            code: 400,
+            message: "Thất bại!",
+        });
+    }
+};

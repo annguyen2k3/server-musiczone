@@ -28,4 +28,12 @@ router.patch(
 
 router.get("/favoriteSong", authMiddeware.requireAuth, controller.favoriteSong);
 
+router.get("/uploadSongs", authMiddeware.requireAuth, controller.uploadSongs);
+
+router.get("/playlistUser", authMiddeware.requireAuth, controller.playlistUser);
+
+router.get("/playlistPublic/:id", controller.playlistPublic);
+
+router.get("/playlistAll", authMiddeware.requireAuth, controller.playlistAll);
+
 module.exports = router;

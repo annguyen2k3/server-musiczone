@@ -10,6 +10,7 @@ const accountRoutes = require("./account.route");
 const playlistRoutes = require("./playlist.route");
 const userRoutes = require("./user.route");
 const topicRoutes = require("./topic.route");
+const searchRoutes = require("./search.route");
 
 //Passport
 passport.use(
@@ -82,6 +83,8 @@ module.exports = (app) => {
     app.use(version + "/user", userRoutes);
 
     app.use(version + "/topics", topicRoutes);
+
+    app.use(version + "/search", searchRoutes);
 
     //Login with Google
 

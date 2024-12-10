@@ -1,5 +1,7 @@
 const User = require("../models/user.model");
 const Song = require("../models/song.model");
+const Topic = require("../models/topic.model");
+const Playlist = require("../models/playlist.model");
 const { like } = require("./song.controller");
 
 //[POST] /api/v1/user
@@ -233,7 +235,7 @@ module.exports.edit = async (req, res) => {
     }
 };
 
-// [GET] /api/v1/users/favoriteSong
+// [GET] /api/v1/user/favoriteSong
 module.exports.favoriteSong = async (req, res) => {
     try {
         const user = req.user;
@@ -245,6 +247,13 @@ module.exports.favoriteSong = async (req, res) => {
                 deleted: false,
             }).lean();
 
+            const topic = await Topic.findOne({
+                _id: song.idTopic,
+                deleted: false,
+            }).lean();
+
+            song["topicTitle"] = topic.title;
+            song["userName"] = user.userName;
             listSongResult.push(song);
         }
 
@@ -252,6 +261,128 @@ module.exports.favoriteSong = async (req, res) => {
             code: 200,
             message: "Thành công!",
             listSong: listSongResult.reverse(),
+        });
+    } catch (error) {
+        res.json({
+            code: 400,
+            message: "Thất bại!",
+        });
+    }
+};
+
+// [GET] /api/v1/user/uploadSongs
+module.exports.uploadSongs = async (req, res) => {
+    try {
+        const user = req.user;
+
+        const songs = await Song.find({
+            idUser: user.id,
+            deleted: false,
+        }).lean();
+
+        if (songs.length > 0) {
+            for (const song of songs) {
+                const topic = await Topic.findOne({
+                    _id: song.idTopic,
+                    deleted: false,
+                }).lean();
+
+                song["topicTitle"] = topic.title;
+                song["userName"] = user.userName;
+            }
+        }
+
+        console.log(songs);
+
+        res.json({
+            code: 200,
+            message: "Thành công!",
+            songs: songs,
+        });
+    } catch (error) {
+        res.json({
+            code: 200,
+            message: "Thất bại!",
+        });
+    }
+};
+
+// [GET] /api/v1/user/playlistUser
+module.exports.playlistUser = async (req, res) => {
+    try {
+        const user = req.user;
+
+        const playlists = await Playlist.find({
+            idUser: user.id,
+        });
+
+        res.json({
+            code: 200,
+            message: "Thành công!",
+            playlists: playlists,
+        });
+    } catch (error) {
+        res.json({
+            code: 400,
+            message: "Thất bại!",
+        });
+    }
+};
+
+// [GET] /api/v1/user/playlistPublic
+module.exports.playlistPublic = async (req, res) => {
+    try {
+        const idUser = req.params.id;
+
+        const playlists = await Playlist.find({
+            idUser: idUser,
+            statusSecurity: "public",
+        });
+
+        res.json({
+            code: 200,
+            message: "Thành công!",
+            playlists: playlists,
+        });
+    } catch (error) {
+        res.json({
+            code: 400,
+            message: "Thất bại!",
+        });
+    }
+};
+
+// [GET] /api/v1/user/playlistAll
+module.exports.playlistAll = async (req, res) => {
+    try {
+        const user = req.user;
+
+        const playlists = await Playlist.find({
+            idUser: user.id,
+            deleted: false,
+        }).lean();
+
+        for (const idlist of user.playlistFavorite) {
+            const list = await Playlist.findOne({
+                _id: idlist,
+                deleted: false,
+            }).lean();
+
+            playlists.push(list);
+        }
+
+        for (const list of playlists) {
+            const userOwner = await User.findOne({
+                _id: list.idUser,
+                deleted: false,
+            });
+            list["userName"] = userOwner.userName;
+        }
+
+        res.json({
+            code: 200,
+            message: "Thành công!",
+            playlists: playlists,
         });
     } catch (error) {
         res.json({

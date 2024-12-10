@@ -171,6 +171,9 @@ module.exports.like = async (req, res) => {
                     if (indexLike === -1) {
                         playlist.likes.push(user.id);
                         await playlist.save();
+
+                        user.playlistFavorite.push(playlist.id);
+                        await user.save();
                     }
                     break;
 
@@ -178,8 +181,16 @@ module.exports.like = async (req, res) => {
                     const index = playlist.likes.indexOf(user.id);
                     if (index !== -1) {
                         playlist.likes.splice(index, 1);
+                        await playlist.save();
                     }
-                    await playlist.save();
+
+                    const indexPlaylistFavor = user.playlistFavorite.indexOf(
+                        playlist.id
+                    );
+                    if (indexPlaylistFavor !== -1) {
+                        user.playlistFavorite.splice(indexPlaylistFavor, 1);
+                        await user.save();
+                    }
                     break;
 
                 default:
@@ -200,6 +211,87 @@ module.exports.like = async (req, res) => {
         res.json({
             code: 200,
             message: "Thất bại: " + error.message,
+        });
+    }
+};
+
+// [POST] /api/v1/playlist/create
+module.exports.create = async (req, res) => {
+    try {
+        const user = req.user;
+        const dataPlaylist = req.body;
+
+        dataPlaylist["idUser"] = user.id;
+
+        const playlist = new PlayList(dataPlaylist);
+        await playlist.save();
+
+        res.json({
+            code: 200,
+            message: "Thành công!",
+            playlist: playlist,
+        });
+    } catch (error) {
+        res.json({
+            code: 400,
+            message: "Thất bại",
+        });
+    }
+};
+
+// [POST] /api/v1/playlist/edit/:id
+module.exports.edit = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const dataPlaylist = req.body;
+
+        await PlayList.updateOne({ _id: id }, dataPlaylist);
+
+        const playlist = await PlayList.findOne({
+            _id: id,
+            deleted: false,
+        }).lean();
+
+        res.json({
+            code: 200,
+            message: "Thành công!",
+            playlist: playlist,
+        });
+    } catch (error) {
+        res.json({
+            code: 400,
+            message: "Thất bại",
+        });
+    }
+};
+
+// [DELETE] /api/v1/playlist/delete/:id
+module.exports.delete = async (req, res) => {
+    try {
+        const user = req.user;
+        const id = req.params.id;
+
+        const playlist = await PlayList.findOne({
+            _id: id,
+        });
+
+        if (playlist.idUser == user.id) {
+            await PlayList.deleteOne({ _id: id });
+
+            res.json({
+                code: 200,
+                message: "Thành công!",
+            });
+        } else {
+            res.json({
+                code: 400,
+                message: "Không có quyền xoá!",
+            });
+        }
+    } catch (error) {
+        res.json({
+            code: 400,
+            message: "Thất bại!",
         });
     }
 };
