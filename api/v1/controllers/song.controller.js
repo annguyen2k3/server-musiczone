@@ -238,3 +238,33 @@ module.exports.delete = async (req, res) => {
         });
     }
 };
+
+// [GET] /api/v1/songs/listenUp/:id
+module.exports.listenUp = async (req, res) => {
+    try {
+        const id = req.params.id;
+
+        const song = await Song.findOne({
+            _id: id,
+            deleted: false,
+            statusSecurity: "public",
+        });
+
+        if (song) {
+            song.listen++;
+            await song.save();
+        }
+
+        res.json({
+            code: 200,
+            message: "Thành công!",
+            song: song,
+        });
+    } catch (error) {
+        console.log(error.message);
+        res.json({
+            code: 400,
+            message: "Thất bại",
+        });
+    }
+};

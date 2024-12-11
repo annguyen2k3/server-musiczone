@@ -35,4 +35,6 @@ router.patch("/like", authMiddeware.requireAuth, controller.like);
 
 router.delete("/delete/:id", authMiddeware.requireAuth, controller.delete);
 
+router.get("/listenUp/:id", controller.listenUp);
+
 module.exports = router;
