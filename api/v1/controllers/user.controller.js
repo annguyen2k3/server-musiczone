@@ -244,8 +244,13 @@ module.exports.favoriteSong = async (req, res) => {
                 deleted: false,
             }).lean();
 
+            const userSong = await User.findOne({
+                _id: song.idUser,
+                deleted: false,
+            }).lean();
+
             song["topicTitle"] = topic.title;
-            song["userName"] = user.userName;
+            song["userName"] = userSong.userName;
             listSongResult.push(song);
         }
 
